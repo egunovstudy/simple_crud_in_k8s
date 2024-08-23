@@ -1,0 +1,10 @@
+spring:
+  jpa:
+    database: postgresql
+  datasource:
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: postgres
+    password: AuWMk8fGiW
+openapi:
+  otusSimpleCrud:
+    base-path:/
