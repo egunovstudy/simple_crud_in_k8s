@@ -9,11 +9,11 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "user", schema = "otus_crud")
+@Table(name = "users")
 public class User {
 
     @Id
-    @SequenceGenerator(name = "UserSequence", sequenceName = "otus_crud.USER_SEQ", allocationSize = 1)
+    @SequenceGenerator(name = "UserSequence", sequenceName = "USER_SEQ", allocationSize = 1)
     @GeneratedValue(strategy=GenerationType.SEQUENCE, generator = "UserSequence")
     private Long id;
 

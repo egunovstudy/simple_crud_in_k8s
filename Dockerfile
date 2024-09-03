@@ -8,5 +8,4 @@ COPY src src
 RUN ./mvnw package
 EXPOSE 8000
 
-ENTRYPOINT ["java", "-jar"]
-CMD ["target/simple-crud-*.jar"]
+ENTRYPOINT ["java", "-jar", "target/simple-crud-0.0.1-SNAPSHOT.jar"]

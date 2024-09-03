@@ -2,9 +2,13 @@ spring:
   jpa:
     database: postgresql
   datasource:
-    url: jdbc:postgresql://localhost:5432/postgres
-    username: postgres
-    password: AuWMk8fGiW
+    url: jdbc:postgresql://${POSTGRES_SVC}:5432/${POSTGRES_DB}
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
 openapi:
   otusSimpleCrud:
-    base-path:/
+    base-path: /
+server:
+  port: 8000
+  servlet:
+    context-path: /simple-crud
