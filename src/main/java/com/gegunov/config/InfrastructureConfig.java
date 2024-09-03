@@ -21,7 +21,6 @@ public class InfrastructureConfig {
 	 * Sets up a {@link LocalContainerEntityManagerFactoryBean} to use Hibernate. Activates picking up entities from the
 	 * project's base package.
 	 * 
-	 * @return
 	 */
 	@Bean
 	public LocalContainerEntityManagerFactoryBean entityManagerFactory(DataSource datasource, JpaVendorAdapter jpaVendorAdapter) {
