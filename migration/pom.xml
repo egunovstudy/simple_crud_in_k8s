@@ -16,7 +16,7 @@
                 </executions>
                 <configuration>
                     <changeLogFile>sql/dbchangelog.xml</changeLogFile>
-                    <url>jdbc:postgresql://${env.POSTGRES_SVC}:5432/${env.POSTGRES_DB}</url>
+                    <url>jdbc:postgresql://${env.POSTGRES_SVC}:${env.POSTGRES_PORT}/${env.POSTGRES_DB}</url>
                     <username>${env.POSTGRES_USER}</username>
                     <password>${env.POSTGRES_PASSWORD}</password>
                 </configuration>

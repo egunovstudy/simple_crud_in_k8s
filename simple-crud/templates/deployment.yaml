@@ -40,8 +40,16 @@
             - configMapRef:
                 name: {{ .Values.postgresql.configmap.name }}
           env:
-            - name: POSTGRES_HOST
-              value: postgres
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: db-creds-secret
+                  key: username
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-creds-secret
+                  key: password
           livenessProbe:
             {{- toYaml .Values.livenessProbe | nindent 12 }}
           resources:

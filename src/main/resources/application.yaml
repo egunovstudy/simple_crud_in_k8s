@@ -2,7 +2,7 @@ spring:
   jpa:
     database: postgresql
   datasource:
-    url: jdbc:postgresql://${POSTGRES_SVC}:5432/${POSTGRES_DB}
+    url: jdbc:postgresql://${POSTGRES_SVC}:${POSTGRES_PORT}/${POSTGRES_DB}
     username: ${POSTGRES_USER}
     password: ${POSTGRES_PASSWORD}
 openapi:
