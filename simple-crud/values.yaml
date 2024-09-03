@@ -1,0 +1,79 @@
+# Default values for simple-crud.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 2
+
+image:
+  repository: glebegunov/simple-crud
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "0.1.3"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+podAnnotations: {}
+podLabels: {}
+
+service:
+  type: NodePort
+  port: 8000
+
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: arch.homework
+      paths:
+        - path: /simple-crud
+          pathType: Prefix
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+resources: {}
+
+livenessProbe:
+  httpGet:
+    path: /actuator/health
+    port: 8000
+  initialDelaySeconds: 60
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+# Additional volumes on the output Deployment definition.
+volumes: []
+# - name: foo
+#   secret:
+#     secretName: mysecret
+#     optional: false
+
+# Additional volumeMounts on the output Deployment definition.
+volumeMounts: []
+
+initContainers:
+  name: check-db-ready
+  image: postgres:9.6.4
+  command: ['sh', '-c',
+    'until pg_isready -h simple-crud-postgresql -p 5432; 
+          do echo waiting for database; sleep 5; done;']
+
+postgresql:
+  fullnameOverride: simple-crud-postgresql
+  auth:
+    username: postgres
+    postgresPassword: qwerty
+  # Values for the deployment of the configmap for the postgresql
+  configmap:
+    name: postgres-configmap
