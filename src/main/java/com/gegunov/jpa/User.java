@@ -13,7 +13,8 @@ import lombok.*;
 public class User {
 
     @Id
-    @GeneratedValue(strategy=GenerationType.AUTO)
+    @SequenceGenerator(name = "UserSequence", sequenceName = "otus_crud.USER_SEQ", allocationSize = 1)
+    @GeneratedValue(strategy=GenerationType.SEQUENCE, generator = "UserSequence")
     private Long id;
 
     @Column(name = "first_name")

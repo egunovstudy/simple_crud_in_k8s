@@ -16,15 +16,13 @@ import javax.sql.DataSource;
 @EnableTransactionManagement
 public class InfrastructureConfig {
 
-
 	/**
 	 * Sets up a {@link LocalContainerEntityManagerFactoryBean} to use Hibernate. Activates picking up entities from the
 	 * project's base package.
-	 * 
 	 */
 	@Bean
-	public LocalContainerEntityManagerFactoryBean entityManagerFactory(DataSource datasource, JpaVendorAdapter jpaVendorAdapter) {
-
+	public LocalContainerEntityManagerFactoryBean entityManagerFactory(DataSource datasource,
+			JpaVendorAdapter jpaVendorAdapter) {
 
 		LocalContainerEntityManagerFactoryBean factory = new LocalContainerEntityManagerFactoryBean();
 		factory.setPackagesToScan("com.gegunov.jpa");
@@ -42,11 +40,10 @@ public class InfrastructureConfig {
 	}
 
 	@Bean
-	public JpaVendorAdapter jpaVendorAdapter(){
+	public JpaVendorAdapter jpaVendorAdapter() {
 		HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
 		vendorAdapter.setDatabasePlatform("org.hibernate.dialect.PostgreSQLDialect");
 		return vendorAdapter;
 	}
-
 
 }
