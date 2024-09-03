@@ -1,0 +1,13 @@
+§apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: simple-crud
+  namespace: default
+subjects:
+  - kind: ServiceAccount
+    name: simple-crud
+    namespace: default
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: simple-crud

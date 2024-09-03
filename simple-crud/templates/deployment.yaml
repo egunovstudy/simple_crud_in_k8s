@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "simple-crud.fullname" . }}
+  name: {{ .Chart.Name }}
   labels:
     {{- include "simple-crud.labels" . | nindent 4 }}
 spec:
@@ -23,14 +23,18 @@ spec:
         {{- toYaml . | nindent 8 }}
         {{- end }}
     spec:
+      serviceAccountName: simple-crud
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       initContainers:
-        - name: {{ .Values.initContainers.name }}
-          image: {{ .Values.initContainers.image }}
-          command: {{ toYaml .Values.initContainers.command | nindent 12 }}
+        - name: "{{ .Chart.Name }}-init"
+          image: "groundnuty/k8s-wait-for:1.3"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          args:
+            - "job"
+            - "{{ .Values.job.name }}-{{ .Values.job.image.tag }}"
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"

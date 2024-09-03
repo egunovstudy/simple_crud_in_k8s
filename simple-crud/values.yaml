@@ -69,6 +69,13 @@ initContainers:
     'until pg_isready -h simple-crud-postgresql -p 5432; 
           do echo waiting for database; sleep 5; done;']
 
+job:
+  name: simple-crud-migration-job
+  restartPolicy: Never
+  image:
+    repository: glebegunov/simple-crud-migration
+    tag: 0.0.3
+
 postgresql:
   fullnameOverride: simple-crud-postgresql
   auth:

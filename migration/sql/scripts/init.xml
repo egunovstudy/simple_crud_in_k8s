@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+    <changeSet id="1" author="glebegunov">
+        <sql>
+            create sequence if not exists user_seq;
+            alter sequence user_seq owner to postgres;
+            create table if not exists users
+            (
+                id
+                bigint,
+                first_name varchar,
+                last_name varchar
+            );
+
+            alter table users owner to postgres;
+        </sql>
+    </changeSet>
+</databaseChangeLog>

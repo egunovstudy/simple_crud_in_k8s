@@ -1,0 +1,26 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ .Values.job.name }}-{{ .Values.job.image.tag }}
+  labels:
+    {{- include "simple-crud.labels" . | nindent 4 }}
+spec:
+  backoffLimit: 1
+  activeDeadlineSeconds: 120
+  template:
+    metadata:
+      labels:
+        {{- include "simple-crud.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.job.image.repository }}:{{ .Values.job.image.tag  }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          envFrom:
+            - configMapRef:
+                name: {{ .Values.postgresql.configmap.name }}
+          env:
+            - name: POSTGRES_HOST
+              value: postgres
+      restartPolicy: {{ .Values.job.restartPolicy }}
+      serviceAccountName: simple-crud

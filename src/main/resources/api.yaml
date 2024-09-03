@@ -27,13 +27,17 @@ paths:
       operationId: createUser
       tags:
         - users
-      parameters:
-        - name: user
-          in: query
-          required: true
-          description: The body of the user to retrieve
-          schema:
-            $ref: "#/components/schemas/User"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+            examples:
+              user:
+                value:
+                  firstName: Gleb
+                  lastName: Egunov
       responses:
         '201':
           description: Null response
