@@ -8,7 +8,7 @@ image:
   repository: glebegunov/simple-crud
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "0.1.3"
+  tag: "0.1.4"
 
 imagePullSecrets: []
 nameOverride: ""
@@ -62,19 +62,12 @@ volumes: []
 # Additional volumeMounts on the output Deployment definition.
 volumeMounts: []
 
-initContainers:
-  name: check-db-ready
-  image: postgres:9.6.4
-  command: ['sh', '-c',
-    'until pg_isready -h simple-crud-postgresql -p 5432; 
-          do echo waiting for database; sleep 5; done;']
-
 job:
   name: simple-crud-migration-job
   restartPolicy: Never
   image:
     repository: glebegunov/simple-crud-migration
-    tag: 0.0.3
+    tag: 0.0.4
 
 postgresql:
   fullnameOverride: simple-crud-postgresql

@@ -9,10 +9,12 @@
             alter sequence user_seq owner to postgres;
             create table if not exists users
             (
-                id
-                bigint,
+                id bigint,
+                username varchar,
                 first_name varchar,
-                last_name varchar
+                last_name varchar,
+                email varchar,
+                phone varchar
             );
 
             alter table users owner to postgres;

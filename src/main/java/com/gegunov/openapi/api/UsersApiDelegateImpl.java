@@ -3,6 +3,7 @@ package com.gegunov.openapi.api;
 import com.gegunov.jpa.UserRepository;
 import com.gegunov.mapper.UserMapper;
 import com.gegunov.openapi.model.User;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.mapstruct.factory.Mappers;
 import org.springframework.http.ResponseEntity;
@@ -40,7 +41,20 @@ public class UsersApiDelegateImpl implements UsersApiDelegate {
     @Override
     public ResponseEntity<User> showUserById(Long userId) {
         UserMapper mapper = Mappers.getMapper(UserMapper.class);
-        User user = mapper.userEntityToUserDto(userRepository.findById(userId).orElseGet(() -> null));
+        User user = mapper.userEntityToUserDto(
+                userRepository.findById(userId).orElseThrow(EntityNotFoundException::new));
         return ResponseEntity.ok(user);
+    }
+
+    @Override
+    public ResponseEntity<Void> updateUser(Long userId, User user) {
+        com.gegunov.jpa.User userFromDb = userRepository.findById(userId).orElseThrow(EntityNotFoundException::new);
+        userFromDb.setFirstName(user.getFirstName());
+        userFromDb.setLastName(user.getLastName());
+        userFromDb.setEmail(user.getEmail());
+        userFromDb.setPhone(user.getPhone());
+
+        userRepository.save(userFromDb);
+        return ResponseEntity.ok().build();
     }
 }
