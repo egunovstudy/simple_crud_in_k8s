@@ -41,7 +41,7 @@ resources: {}
 
 livenessProbe:
   httpGet:
-    path: /actuator/health
+    path: /simple-crud/actuator/health
     port: 8000
   initialDelaySeconds: 60
 
