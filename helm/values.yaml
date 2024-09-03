@@ -1,14 +1,10 @@
-# Default values for simple-crud.
-# This is a YAML-formatted file.
-# Declare variables to be passed into your templates.
-
 replicaCount: 2
 
 image:
   repository: glebegunov/simple-crud
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "0.1.4"
+  tag: "0.1.7"
 
 imagePullSecrets: []
 nameOverride: ""
@@ -67,11 +63,12 @@ job:
   restartPolicy: Never
   image:
     repository: glebegunov/simple-crud-migration
-    tag: 0.0.4
+    tag: 0.0.6
 
 postgresql:
   fullnameOverride: simple-crud-postgresql
   auth:
+    database: postgres
     username: postgres
     postgresPassword: qwerty
   # Values for the deployment of the configmap for the postgresql

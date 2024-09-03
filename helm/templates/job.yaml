@@ -12,6 +12,11 @@ spec:
       labels:
         {{- include "simple-crud.selectorLabels" . | nindent 8 }}
     spec:
+      initContainers:
+        - name: check-db-ready
+          image: postgres:9.6.4
+          command: [ 'sh', '-c', 'until pg_isready -h simple-crud-postgresql -p 5432;
+                do echo waiting for database; sleep 5; done;' ]
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.job.image.repository }}:{{ .Values.job.image.tag  }}"

@@ -18,11 +18,11 @@ public class UsersApiDelegateImpl implements UsersApiDelegate {
     private final UserRepository userRepository;
 
     @Override
-    public ResponseEntity<Void> createUser(User userDto) {
+    public ResponseEntity<Long> createUser(User userDto) {
         UserMapper mapper = Mappers.getMapper(UserMapper.class);
         com.gegunov.jpa.User user = mapper.userDtoToUserEntity(userDto);
-        userRepository.save(user);
-        return ResponseEntity.ok().build();
+        com.gegunov.jpa.User saved = userRepository.save(user);
+        return ResponseEntity.ok(saved.getId());
     }
 
     @Override
@@ -49,6 +49,7 @@ public class UsersApiDelegateImpl implements UsersApiDelegate {
     @Override
     public ResponseEntity<Void> updateUser(Long userId, User user) {
         com.gegunov.jpa.User userFromDb = userRepository.findById(userId).orElseThrow(EntityNotFoundException::new);
+        userFromDb.setUsername(user.getUsername());
         userFromDb.setFirstName(user.getFirstName());
         userFromDb.setLastName(user.getLastName());
         userFromDb.setEmail(user.getEmail());

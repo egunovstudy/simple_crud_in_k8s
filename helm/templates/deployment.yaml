@@ -1,4 +1,11 @@
-|  {{- if not .Values.autoscaling.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Chart.Name }}
+  labels:
+    {{- include "simple-crud.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
   {{- end }}
   selector:
