@@ -12,3 +12,22 @@ server:
   port: 8000
   servlet:
     context-path: /simple-crud
+
+management:
+  endpoint:
+    health:
+      show-details: always
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+  metrics:
+    distribution:
+      percentiles:
+        "[http.server.requests]": 0.5, 0.95, 0.99
+      percentiles-histogram:
+        "[http.server.requests]": true

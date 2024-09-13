@@ -1,0 +1,17 @@
+{
+	"ulid": "01J7FGD7454QKKJNP18R72PAWS",
+	"minTime": 1726012801932,
+	"maxTime": 1726020000000,
+	"stats": {
+		"numSamples": 287287,
+		"numSeries": 755,
+		"numChunks": 2296
+	},
+	"compaction": {
+		"level": 1,
+		"sources": [
+			"01J7FGD7454QKKJNP18R72PAWS"
+		]
+	},
+	"version": 1
+}
