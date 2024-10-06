@@ -14,7 +14,7 @@ import javax.sql.DataSource;
 
 @Configuration
 @EnableTransactionManagement
-public class InfrastructureConfig {
+public class JpaConfig {
 
 	/**
 	 * Sets up a {@link LocalContainerEntityManagerFactoryBean} to use Hibernate. Activates picking up entities from the

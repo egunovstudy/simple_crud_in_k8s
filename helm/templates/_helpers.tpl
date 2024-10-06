@@ -60,3 +60,15 @@ Create the name of the service account to use
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
 {{- end }}
+
+{{- define "simple-crud.backend.name" -}}
+{{- printf "backend-%s" .Release.Name -}}
+{{- end }}
+
+{{- define "simple-crud.ui.name" -}}
+{{- printf "ui-%s" .Release.Name -}}
+{{- end }}
+
+{{- define "simple-crud.gateway.name" -}}
+{{- printf "gateway-%s" .Release.Name -}}
+{{- end }}

@@ -1,6 +1,6 @@
 {{- if .Values.ingress.enabled -}}
 {{- $fullName := include "simple-crud.fullname" . -}}
-{{- $svcPort := .Values.service.port -}}
+{{- $svcPort := .Values.gateway.service.port -}}
 {{- if and .Values.ingress.className (not (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion)) }}
   {{- if not (hasKey .Values.ingress.annotations "kubernetes.io/ingress.class") }}
   {{- $_ := set .Values.ingress.annotations "kubernetes.io/ingress.class" .Values.ingress.className}}
@@ -49,11 +49,11 @@ spec:
             backend:
               {{- if semverCompare ">=1.19-0" $.Capabilities.KubeVersion.GitVersion }}
               service:
-                name: {{ $fullName }}
+                name: gateway-simple-crud
                 port:
                   number: {{ $svcPort }}
               {{- else }}
-              serviceName: {{ $fullName }}
+              serviceName: gateway-simple-crud
               servicePort: {{ $svcPort }}
               {{- end }}
           {{- end }}

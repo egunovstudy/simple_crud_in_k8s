@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{- include "simple-crud.gateway.name" . | nindent 4}}
+  labels:
+    {{- include "simple-crud.labels" . | nindent 4 }}
+    tier: gateway
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.gateway.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "simple-crud.selectorLabels" . | nindent 6 }}
+      tier: gateway
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "simple-crud.labels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+        tier: gateway
+    spec:
+      serviceAccountName: simple-crud
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ .Values.gateway.name }}
+          image: "{{ .Values.gateway.container.repository }}:{{ .Values.gateway.container.tag }}"
+          imagePullPolicy: {{ .Values.gateway.container.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.gateway.service.port }}
+              protocol: TCP
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          {{- with .Values.volumeMounts }}
+          volumeMounts:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+      {{- with .Values.volumes }}
+      volumes:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

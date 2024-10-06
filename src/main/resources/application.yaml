@@ -1,3 +1,6 @@
+logging:
+  level:
+    org.springframework.security: INFO
 spring:
   jpa:
     database: postgresql
@@ -5,13 +8,21 @@ spring:
     url: jdbc:postgresql://${POSTGRES_SVC}:${POSTGRES_PORT}/${POSTGRES_DB}
     username: ${POSTGRES_USER}
     password: ${POSTGRES_PASSWORD}
+  # the current backend is configured to be used as a resource server
+  # then, I must indicate the URI of the backend-auth to be used and which token to be used
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+#          issuer-uri: ${keycloack.baseurl}/realms/my_realm
+          jwk-set-uri: ${keycloack.baseurl}/realms/my_realm/protocol/openid-connect/certs
 openapi:
   otusSimpleCrud:
     base-path: /
 server:
   port: 8000
   servlet:
-    context-path: /simple-crud
+    context-path: /api
 
 management:
   endpoint:
@@ -31,3 +42,10 @@ management:
         "[http.server.requests]": 0.5, 0.95, 0.99
       percentiles-histogram:
         "[http.server.requests]": true
+
+keycloack:
+  baseurl: http://keycloack-keycloak/auth
+
+user:
+  account:
+    url: ${keycloack.baseurl}/realms/my_realm/account/

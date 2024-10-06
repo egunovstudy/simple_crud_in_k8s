@@ -1,10 +1,35 @@
-replicaCount: 2
+backend:
+  name: simple-crud-backend
+  replicaCount: 2
+  container:
+    repository: glebegunov/simple-crud
+    pullPolicy: IfNotPresent
+    tag: "0.1.9"
+  service:
+    type: ClusterIP
+    port: 8000
 
-image:
-  repository: glebegunov/simple-crud
-  pullPolicy: IfNotPresent
-  # Overrides the image tag whose default is the chart appVersion.
-  tag: "0.1.8"
+ui:
+  replicaCount: 1
+  name: simple-crud-ui
+  container:
+    repository: glebegunov/crud-ui
+    pullPolicy: Never
+    tag: "0.0.3"
+  service:
+    type: ClusterIP
+    port: 3000
+
+gateway:
+  replicaCount: 1
+  name: simple-crud-gateway
+  container:
+    repository: glebegunov/backend-gateway
+    pullPolicy: Never
+    tag: 0.0.7
+  service:
+    type: ClusterIP
+    port: 8080
 
 imagePullSecrets: []
 nameOverride: ""
@@ -13,9 +38,6 @@ fullnameOverride: ""
 podAnnotations: {}
 podLabels: {}
 
-service:
-  type: NodePort
-  port: 8000
 
 ingress:
   enabled: true
@@ -26,7 +48,7 @@ ingress:
   hosts:
     - host: arch.homework
       paths:
-        - path: /simple-crud
+        - path: /
           pathType: Prefix
   tls: []
   #  - secretName: chart-example-tls
@@ -37,7 +59,7 @@ resources: {}
 
 livenessProbe:
   httpGet:
-    path: /simple-crud/actuator/health
+    path: /api/actuator/health
     port: 8000
   initialDelaySeconds: 60
 

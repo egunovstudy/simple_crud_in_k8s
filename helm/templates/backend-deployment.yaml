@@ -1,16 +1,18 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Chart.Name }}
+  name: {{- include "simple-crud.backend.name" . | nindent 4 }}
   labels:
     {{- include "simple-crud.labels" . | nindent 4 }}
+    tier: backend
 spec:
   {{- if not .Values.autoscaling.enabled }}
-  replicas: {{ .Values.replicaCount }}
+  replicas: {{ .Values.backend.replicaCount }}
   {{- end }}
   selector:
     matchLabels:
       {{- include "simple-crud.selectorLabels" . | nindent 6 }}
+      tier: backend
   template:
     metadata:
       {{- with .Values.podAnnotations }}
@@ -22,6 +24,7 @@ spec:
         {{- with .Values.podLabels }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
+        tier: backend
     spec:
       serviceAccountName: simple-crud
       {{- with .Values.imagePullSecrets }}
@@ -31,17 +34,17 @@ spec:
       initContainers:
         - name: "{{ .Chart.Name }}-init"
           image: "groundnuty/k8s-wait-for:1.3"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          imagePullPolicy: {{ .Values.backend.pullPolicy }}
           args:
             - "job"
-            - "{{ .Values.job.name }}-{{ .Values.job.image.tag }}"
+            - "{{ .Values.job.name }}"
       containers:
-        - name: {{ .Chart.Name }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
+        - name: {{ .Values.backend.name }}
+          image: "{{ .Values.backend.container.repository }}:{{ .Values.backend.container.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.backend.container.pullPolicy }}
           ports:
             - name: http
-              containerPort: {{ .Values.service.port }}
+              containerPort: {{ .Values.backend.service.port }}
               protocol: TCP
           envFrom:
             - configMapRef:

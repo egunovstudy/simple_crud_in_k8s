@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: {{ .Values.job.name }}-{{ .Values.job.image.tag }}
+  name: {{ .Values.job.name }}
   labels:
     {{- include "simple-crud.labels" . | nindent 4 }}
 spec:
@@ -20,7 +20,7 @@ spec:
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.job.image.repository }}:{{ .Values.job.image.tag  }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          imagePullPolicy: {{ .Values.backend.pullPolicy }}
           envFrom:
             - configMapRef:
                 name: {{ .Values.postgresql.configmap.name }}
