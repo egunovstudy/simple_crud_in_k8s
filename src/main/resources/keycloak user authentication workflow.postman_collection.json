@@ -1,0 +1,789 @@
+{
+	"info": {
+		"_postman_id": "ba973668-f1c4-438b-9cbb-95f945d68270",
+		"name": "keycloak user authentication workflow",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "1776670"
+	},
+	"item": [
+		{
+			"name": "get master token",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var accessToken = pm.response.json()['access_token']",
+							"pm.collectionVariables.set(\"masterAccessToken\", accessToken);",
+							"console.log('Получен masterAccessToken для регистрации пользователей')"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "client_id",
+							"value": "frontend-client",
+							"type": "text"
+						},
+						{
+							"key": "username",
+							"value": "{{master_username}}",
+							"type": "text"
+						},
+						{
+							"key": "grant_type",
+							"value": "password",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "{{password}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{keycloak_baseurl}}/realms/my_realm/protocol/openid-connect/token",
+					"host": [
+						"{{keycloak_baseurl}}"
+					],
+					"path": [
+						"realms",
+						"my_realm",
+						"protocol",
+						"openid-connect",
+						"token"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "register user A",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const lodash = require('lodash');",
+							"let user_A_username =pm.collectionVariables.get(\"default_username\") + \"a\" + lodash.random(10);",
+							"pm.collectionVariables.set('user_A_username', user_A_username)",
+							"pm.collectionVariables.set('user_A_field_value',pm.collectionVariables.get('user_A_username'))",
+							"console.log(\"Регистрация пользоватебя A\")",
+							"console.log(\"user_A_username = \" + user_A_username + \", user_A_field_value = \" + pm.collectionVariables.get('user_A_field_value'))"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Register user A info. Status code is 201\", ()=>{",
+							"    pm.expect(pm.response.code).to.eql(201);",
+							"    console.log(\"Пользователь А успешно зарегистрирован\")",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{masterAccessToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"{{user_A_username}}\",\n    \"firstName\": \"{{user_A_field_value}}\",\n    \"lastName\": \"{{user_A_field_value}}\",\n    \"email\": \"{{user_A_field_value}}@mail.com\",\n    \"emailVerified\": true,\n    \"enabled\": true,\n    \"attributes\": {\n        \"phone\": \"{{user_A_field_value}}\"\n    },\n    \"credentials\": [\n        {\n            \"temporary\": false,\n            \"type\": \"password\",\n            \"value\": \"{{password}}\"\n        }\n    ]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{keycloak_baseurl}}/admin/realms/my_realm/users",
+					"host": [
+						"{{keycloak_baseurl}}"
+					],
+					"path": [
+						"admin",
+						"realms",
+						"my_realm",
+						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get_user_A_access_token",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Register user A info. Status code is 200\", ()=>{",
+							"    pm.expect(pm.response.code).to.eql(200);",
+							"    pm.expect(pm.response.json()['access_token']).not.to.be.an('undefined')",
+							"    pm.collectionVariables.set('user_A_access_token', pm.response.json()['access_token'])",
+							"    console.log('Получен access_token пользователя A')",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "client_id",
+							"value": "frontend-client",
+							"type": "text"
+						},
+						{
+							"key": "username",
+							"value": "{{user_A_username}}",
+							"type": "text"
+						},
+						{
+							"key": "grant_type",
+							"value": "password",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "{{password}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{keycloak_baseurl}}/realms/my_realm/protocol/openid-connect/token",
+					"host": [
+						"{{keycloak_baseurl}}"
+					],
+					"path": [
+						"realms",
+						"my_realm",
+						"protocol",
+						"openid-connect",
+						"token"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get_user_A_info",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Get user A info. Status code is 200\", ()=>{",
+							"    pm.expect(pm.response.code).to.equal(200);",
+							"});",
+							"pm.test(\"User A info. Data is correct\", () =>{",
+							"    let jsonData = pm.response.json()",
+							"    pm.expect(jsonData['username']).to.equal(pm.collectionVariables.get('user_A_username'))",
+							"    pm.collectionVariables.set(\"user_A_body\", jsonData)",
+							"    console.log(\"Получены данные пользователя А: \" + JSON.stringify(jsonData))",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"console.log(\"Получение данных пользователя А\")"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{user_A_access_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{api_url}}/users/info",
+					"host": [
+						"{{api_url}}"
+					],
+					"path": [
+						"users",
+						"info"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "register user B",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const lodash = require('lodash');",
+							"let user_B_username = pm.collectionVariables.get(\"default_username\") + \"b\" + lodash.random(10);",
+							"pm.collectionVariables.set('user_B_username', user_B_username)",
+							"pm.collectionVariables.set('user_B_field_value', pm.collectionVariables.get('user_B_username'))",
+							"",
+							"console.log(\"Регистрация пользователя B\")",
+							"console.log(\"user_B_username = \" + user_B_username + \", user_B_field_value = \" + pm.collectionVariables.get('user_B_field_value'))"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Register user B info. Status code is 201\", ()=>{",
+							"    pm.expect(pm.response.code).to.equal(201);",
+							"    console.log(\"Пользователь B успешно зарегистрирован\")",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{masterAccessToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"{{user_B_username}}\",\n    \"firstName\": \"{{user_B_field_value}}\",\n    \"lastName\": \"{{user_B_field_value}}\",\n    \"email\": \"{{user_B_field_value}}@mail.com\",\n    \"emailVerified\": true,\n    \"enabled\": true,\n    \"attributes\": {\n        \"phone\": \"{{user_B_field_value}}\"\n    },\n    \"credentials\": [\n        {\n            \"temporary\": false,\n            \"type\": \"password\",\n            \"value\": \"{{password}}\"\n        }\n    ]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{keycloak_baseurl}}/admin/realms/my_realm/users",
+					"host": [
+						"{{keycloak_baseurl}}"
+					],
+					"path": [
+						"admin",
+						"realms",
+						"my_realm",
+						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get_user_B_access_token",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Get user B info. Status code is 200\", ()=>{",
+							"    pm.expect(pm.response.code).to.eql(200);",
+							"    pm.expect(pm.response.json()['access_token']).not.to.be.an('undefined')",
+							"    pm.collectionVariables.set('user_B_access_token', pm.response.json()['access_token'])",
+							"    console.log('Получен access_token пользователя B')",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "client_id",
+							"value": "frontend-client",
+							"type": "text"
+						},
+						{
+							"key": "username",
+							"value": "{{user_B_username}}",
+							"type": "text"
+						},
+						{
+							"key": "grant_type",
+							"value": "password",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "{{password}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{keycloak_baseurl}}/realms/my_realm/protocol/openid-connect/token",
+					"host": [
+						"{{keycloak_baseurl}}"
+					],
+					"path": [
+						"realms",
+						"my_realm",
+						"protocol",
+						"openid-connect",
+						"token"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get_user_B_info",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Get user B info. Status code is 200\", ()=>{",
+							"    pm.expect(pm.response.code).to.equal(200);",
+							"});",
+							"pm.test(\"User B info. Data is correct\", () =>{",
+							"    let jsonData = pm.response.json()",
+							"    pm.expect(jsonData['username']).to.equal(pm.collectionVariables.get('user_B_username'))",
+							"    pm.collectionVariables.set(\"user_B_body\", jsonData)",
+							"    console.log(\"Получены данные пользователя B: \" + JSON.stringify(jsonData))",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"console.log(\"Получение данных пользователя B\")"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{user_B_access_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{api_url}}/users/info",
+					"host": [
+						"{{api_url}}"
+					],
+					"path": [
+						"users",
+						"info"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "update_user_A",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"let user_a_body_upd = pm.collectionVariables.get('user_A_body')",
+							"",
+							"const lodash = require('lodash');",
+							"let user_A_field_value = pm.collectionVariables.get('user_A_field_value') + lodash.random(10)",
+							"pm.collectionVariables.set('user_A_field_value', user_A_field_value)",
+							"console.log(\"Выполняется обновление пользователя A\")",
+							"console.log(\"Данные А до обновления: \" + user_a_body_upd)",
+							"user_a_body_upd['firstName'] = user_A_field_value",
+							"user_a_body_upd['lastName'] = user_A_field_value",
+							"user_a_body_upd['phone'] = user_A_field_value",
+							"user_a_body_upd['email'] = user_A_field_value + \"@mail.ru\"",
+							"delete user_a_body_upd['username']",
+							"",
+							"user_a_body_upd = JSON.stringify(user_a_body_upd)",
+							"pm.collectionVariables.set('user_A_body_upd', user_a_body_upd)",
+							"console.log(\"Данные А БУДУТ обновлены на : \" + user_a_body_upd)"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Update user A. Status code is 200\", ()=>{",
+							"    pm.expect(pm.response.code).to.eql(200);",
+							"    console.log('Запрос на обновление пользователя А выполнен успешно')",
+							"});",
+							"",
+							"",
+							"console.log(\"Проверка, что данные пользователя A обновились на сервере\")",
+							"",
+							"pm.sendRequest({",
+							"url: pm.collectionVariables.get('api_url') + \"/users/info\",",
+							"method: \"GET\",",
+							"header: {",
+							"\"Content-Type\": \"application/x-www-form-urlencoded\",",
+							"\"Authorization\": \"Bearer \" + pm.collectionVariables.get('user_A_access_token')",
+							"}",
+							"}, function (err, res) {",
+							"    ",
+							"        pm.test(\"user a data received from server\", ()=>{",
+							"            pm.expect(err).to.be.a('null');",
+							"        })",
+							"        ",
+							"        let jsonData = res.json();",
+							"        console.log(\"Получены данные пользователя A с сервера: \" + jsonData)",
+							"        let user_A_body_upd = JSON.parse(pm.collectionVariables.get('user_A_body_upd'))",
+							"        console.log(\"В коллекции сохранены такие данные пользователя A: \" + user_A_body_upd)",
+							"        pm.test(\"Test values updated on server\", ()=>{",
+							"            pm.expect(jsonData['phone']).to.equal(user_A_body_upd['phone'])",
+							"            pm.expect(jsonData['firstName']).to.equal(user_A_body_upd['firstName'])",
+							"            pm.expect(jsonData['lastName']).to.equal(user_A_body_upd['lastName'])",
+							"            pm.expect(jsonData['email']).to.equal(user_A_body_upd['email'])",
+							"            console.log(\"Данные пользователя А действительно успешно обновлены на сервере\")",
+							"        })  ",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{user_A_access_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{{user_A_body_upd}}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{api_url}}/users/info",
+					"host": [
+						"{{api_url}}"
+					],
+					"path": [
+						"users",
+						"info"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "update_user_B",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"let user_b_body_upd = pm.collectionVariables.get('user_B_body')",
+							"",
+							"const lodash = require('lodash');",
+							"let user_B_field_value = pm.collectionVariables.get('user_B_field_value') + lodash.random(10)",
+							"",
+							"console.log(\"Выполняется обновление пользователя A\")",
+							"console.log(\"Данные B до обновления: \" + user_b_body_upd)",
+							"pm.collectionVariables.set('user_B_field_value', user_B_field_value)",
+							"user_b_body_upd['firstName'] = user_B_field_value",
+							"user_b_body_upd['lastName'] = user_B_field_value",
+							"user_b_body_upd['phone'] = user_B_field_value",
+							"user_b_body_upd['email'] = user_B_field_value + \"@mail.ru\"",
+							"delete user_b_body_upd['username']",
+							"",
+							"user_b_body_upd = JSON.stringify(user_b_body_upd)",
+							"pm.collectionVariables.set('user_B_body_upd', user_b_body_upd)",
+							"console.log(\"Данные А БУДУТ обновлены на : \" + user_b_body_upd)",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Update user B. Status code is 200\", ()=>{",
+							"    pm.expect(pm.response.code).to.eql(200);",
+							"    console.log('Запрос на обновление пользователя B выполнен успешно')",
+							"});",
+							"",
+							"console.log(\"Проверка, что данные пользователя B обновились на сервере\")",
+							"",
+							"pm.sendRequest({",
+							"url: pm.collectionVariables.get('api_url') + \"/users/info\",",
+							"method: \"GET\",",
+							"header: {",
+							"\"Content-Type\": \"application/x-www-form-urlencoded\",",
+							"\"Authorization\": \"Bearer \" + pm.collectionVariables.get('user_B_access_token')",
+							"}",
+							"}, function (err, res) {",
+							"    ",
+							"        pm.test(\"No error\", ()=>{",
+							"            pm.expect(err).to.be.a('null');",
+							"        })",
+							"        ",
+							"        let jsonData = res.json();",
+							"        console.log(\"Получены данные пользователя B с сервера: \" + JSON.stringify(jsonData))",
+							"        let user_B_body_upd = JSON.parse(pm.collectionVariables.get('user_B_body_upd'))",
+							"        console.log(\"В коллекции сохранены такие данные пользователя B: \" + JSON.stringify(user_B_body_upd))",
+							"        pm.test(\"Test values updated on server\", ()=>{",
+							"            ",
+							"            pm.expect(jsonData['phone']).to.equal(user_B_body_upd['phone'])",
+							"            pm.expect(jsonData['firstName']).to.equal(user_B_body_upd['firstName'])",
+							"            pm.expect(jsonData['lastName']).to.equal(user_B_body_upd['lastName'])",
+							"            pm.expect(jsonData['email']).to.equal(user_B_body_upd['email'])",
+							"            console.log(\"Данные пользователя B действительно успешно обновлены на сервере\")",
+							"        })  ",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{user_B_access_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{{user_B_body_upd}}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{api_url}}/users/info",
+					"host": [
+						"{{api_url}}"
+					],
+					"path": [
+						"users",
+						"info"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "master_username",
+			"value": "user1",
+			"type": "string"
+		},
+		{
+			"key": "password",
+			"value": "mypassword",
+			"type": "string"
+		},
+		{
+			"key": "keycloak_baseurl",
+			"value": "http://arch.homework/auth",
+			"type": "string"
+		},
+		{
+			"key": "api_url",
+			"value": "http://arch.homework/api",
+			"type": "string"
+		},
+		{
+			"key": "default_username",
+			"value": "user_",
+			"type": "string"
+		},
+		{
+			"key": "masterAccessToken",
+			"value": ""
+		},
+		{
+			"key": "user_A_username",
+			"value": ""
+		},
+		{
+			"key": "user_A_field_value",
+			"value": ""
+		},
+		{
+			"key": "user_A_access_token",
+			"value": ""
+		},
+		{
+			"key": "user_A_body",
+			"value": ""
+		},
+		{
+			"key": "user_B_username",
+			"value": ""
+		},
+		{
+			"key": "user_B_field_value",
+			"value": ""
+		},
+		{
+			"key": "user_B_access_token",
+			"value": ""
+		},
+		{
+			"key": "user_B_body",
+			"value": ""
+		},
+		{
+			"key": "user_A_body_upd",
+			"value": ""
+		},
+		{
+			"key": "user_B_body_upd",
+			"value": ""
+		}
+	]
+}
